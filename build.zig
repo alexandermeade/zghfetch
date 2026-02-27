@@ -167,4 +167,14 @@ pub fn build(b: *std.Build) void {
 
     // libcurl is still a system library
     exe.linkSystemLibrary("curl");
+
+    const mibu_dep = b.dependency("mibu", .{});
+    exe.root_module.addImport("mibu", mibu_dep.module("mibu"));
+
+    const zigimg_dependency = b.dependency("zigimg", .{
+    .target = target,
+    .optimize = optimize,
+});
+
+    exe.root_module.addImport("zigimg", zigimg_dependency.module("zigimg"));
 }
