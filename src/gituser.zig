@@ -50,19 +50,19 @@ pub const GitHubUser = struct {
 
     pub fn fetch_profile(self: @This(), easy: curl.Easy, allocator: std.mem.Allocator) ![] const u8 {
         // Now use user
-        std.debug.print("\ngetting image\n", .{});
+        //std.debug.print("\ngetting image\n", .{});
         var img_writer = std.io.Writer.Allocating.init(allocator);
         defer img_writer.deinit();
         
         const url_z = try allocator.dupeZ(u8, self.user_info.value.avatar_url);
         defer allocator.free(url_z);
         
-        const img_resp = try easy.fetch(url_z, .{ .writer = @constCast(&img_writer.writer)});
+        _ = try easy.fetch(url_z, .{ .writer = @constCast(&img_writer.writer)});
         
         var img_items = img_writer.toArrayList();
         defer img_items.deinit(allocator);
 
-        std.debug.print("Status code: {d}\nImage size: {d} bytes\n", .{ img_resp.status_code, img_items.items.len});
+        //std.debug.print("Status code: {d}\nImage size: {d} bytes\n", .{ img_resp.status_code, img_items.items.len});
             
         var file = try std.fs.cwd().createFile("profile.png", .{});
         defer file.close();
@@ -80,7 +80,7 @@ pub const GitHubUser = struct {
         var items = writer.toArrayList();
         defer items.deinit(allocator);
         
-        std.debug.print("\nGET with fixed buffer as body\n", .{});
+        //std.debug.print("\nGET with fixed buffer as body\n", .{});
         //std.debug.print("Status code: {d}\nBody: {s}\n", .{ resp.status_code, items.items});
         
         const parsed_value = try std.json.parseFromSlice(GitHubUserInfo, allocator, items.items, .{ .ignore_unknown_fields = true});

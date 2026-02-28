@@ -48,7 +48,7 @@ pub fn main() !void {
 
     //try user.save_profile(easy, allocator);
 
-    var stdout_buffer: [4096]u8 = undefined;
+    var stdout_buffer: [65536]u8 = undefined;
     
     var stdout_file = std.fs.File.stdout();
 
