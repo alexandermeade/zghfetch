@@ -26,7 +26,6 @@ pub fn setup_term(stdout: *std.Io.Writer) !void {
     defer cursor.show(stdout) catch {};
 }
 
-
 pub fn main() !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;
     defer if (gpa.deinit() != .ok) @panic("leak");
@@ -48,13 +47,13 @@ pub fn main() !void {
 
     //try user.save_profile(easy, allocator);
 
-    var stdout_buffer: [65536]u8 = undefined;
+    //var stdout_buffer: [65536]u8 = undefined;
     
-    var stdout_file = std.fs.File.stdout();
+    //var stdout_file = std.fs.File.stdout();
 
-    var stdout_writer = stdout_file.writer(&stdout_buffer);
+    //var stdout_writer = stdout_file.writer(&stdout_buffer);
 
-    const stdout = &stdout_writer.interface;
+    //const stdout = &stdout_writer.interface;
     //try setup_term(stdout);
 
     //ktry cursor.goTo(stdout, 1, 1);
@@ -63,6 +62,5 @@ pub fn main() !void {
     //try stdout.flush();
     const a: []const u8 = try user.fetch_profile(easy, allocator); 
     defer allocator.free(a);
-    try kitty.displayImage(a, stdout, allocator);
+    try kitty.displayImage(a,  allocator);
 }
-
