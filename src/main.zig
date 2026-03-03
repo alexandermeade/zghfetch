@@ -1,14 +1,16 @@
 const std = @import("std");
-const curl = @import("curl");
-const gituser = @import("gituser.zig");
+const Io = std.Io;
 const builtin = @import("builtin");
 
+const curl = @import("curl");
 const mibu = @import("mibu");
 const term = mibu.term;
 const color = mibu.color;
 const cursor = mibu.cursor;
-const Io = std.Io;
+
+const gituser = @import("gituser.zig");
 const kitty = @import("kitty.zig");
+const zgh_user = @import("zgh_user.zig");
 
 pub fn setup_term(stdout: *std.Io.Writer) !void {
     // we have to make sure that exitAlternateScreen
@@ -60,7 +62,18 @@ pub fn main() !void {
     //try mibu.style.italic(stdout, true);
     //try stdout.print("This is being shown in the alternate screen...", .{});
     //try stdout.flush();
-    const a: []const u8 = try user.fetch_profile(easy, allocator); 
-    defer allocator.free(a);
-    try kitty.displayImage(a,  allocator);
+    
+    //const a: []const u8 = try user.fetch_profile(easy, allocator); 
+
+    //defer allocator.free(a);
+    
+    const alex = zgh_user.User {
+        .name = "Alex",
+        .profile_path = "test.png",
+        .prev_fetch_time = "02"
+    };
+
+    try alex.display_user(allocator);
+    
+    //try kitty.display_image(a,  allocator);
 }

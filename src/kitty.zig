@@ -7,7 +7,7 @@ const std = @import("std");
 const base64 = std.base64.standard.Encoder;
 const zigimg = @import("zigimg");
 
-pub fn convertJpegToPngMemory(allocator: std.mem.Allocator, jpeg_bytes: []const u8) ![]u8 {
+pub fn convert_jpeg_to_png(allocator: std.mem.Allocator, jpeg_bytes: []const u8) ![]u8 {
     var image = try zigimg.Image.fromMemory(allocator, jpeg_bytes);
     defer image.deinit(allocator);
 
@@ -23,8 +23,8 @@ pub fn convertJpegToPngMemory(allocator: std.mem.Allocator, jpeg_bytes: []const 
     return try allocator.dupe(u8, result);
 }
 
-pub fn displayImage(jpeg_data: []const u8, allocator: std.mem.Allocator) !void {
-    const png_data = try convertJpegToPngMemory(allocator, jpeg_data);
+pub fn display_image(jpeg_data: []const u8, allocator: std.mem.Allocator) !void {
+    const png_data = try convert_jpeg_to_png(allocator, jpeg_data);
     defer allocator.free(png_data);
 
     const encoded_len = base64.calcSize(png_data.len);
@@ -65,3 +65,44 @@ pub fn displayImage(jpeg_data: []const u8, allocator: std.mem.Allocator) !void {
 
     try tty.writeAll("\n");
 }
+
+pub fn display_png(png_data: []const u8, allocator: std.mem.Allocator) !void {
+    const encoded_len = base64.calcSize(png_data.len);
+    const encrypted = try allocator.alloc(u8, encoded_len);
+    defer allocator.free(encrypted);
+    _ = base64.encode(encrypted, png_data);
+
+    //Kitty protocal requires writer to ouptput to tty
+    const tty = try std.fs.openFileAbsolute("/dev/tty", .{ .mode = .write_only });
+    defer tty.close();
+
+    const payload_size = 4096;
+    var start_index: usize = 0;
+    var first_chunk = true;
+
+    while (start_index < encoded_len) {
+        var end_index = start_index + payload_size;
+        const eof = end_index >= encoded_len;
+        if (eof) end_index = encoded_len;
+
+        const eof_flag = if (eof) "0" else "1";
+
+        if (first_chunk) {
+            const header = try std.fmt.allocPrint(allocator, "\x1b_Ga=T,f=100,q=0,m={s};", .{eof_flag});
+            defer allocator.free(header);
+            try tty.writeAll(header);
+            first_chunk = false;
+        } else {
+            const header = try std.fmt.allocPrint(allocator, "\x1b_Gm={s};", .{eof_flag});
+            defer allocator.free(header);
+            try tty.writeAll(header);
+        }
+
+        try tty.writeAll(encrypted[start_index..end_index]);
+        try tty.writeAll("\x1b\\");
+        start_index += payload_size;
+    }
+
+    try tty.writeAll("\n");
+}
+
