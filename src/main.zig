@@ -13,8 +13,6 @@ const kitty = @import("kitty.zig");
 const zgh_user = @import("zgh_user.zig");
 
 pub fn setup_term(stdout: *std.Io.Writer) !void {
-    // we have to make sure that exitAlternateScreen
-    // and cursor.show are flushed when the program exits.
     defer stdout.*.flush() catch {};
 
     if (builtin.os.tag == .windows) {
@@ -66,14 +64,15 @@ pub fn main() !void {
     //const a: []const u8 = try user.fetch_profile(easy, allocator); 
 
     //defer allocator.free(a);
-    
+
+
     const alex = zgh_user.User {
         .name = "Alex",
+        .profile_url = URL,
         .profile_path = "test.png",
         .prev_fetch_time = "02"
     };
 
-    try alex.display_user(allocator);
+    try alex.display_user(easy, allocator);
     
-    //try kitty.display_image(a,  allocator);
 }
