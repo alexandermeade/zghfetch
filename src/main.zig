@@ -73,6 +73,5 @@ pub fn main() !void {
         .prev_fetch_time = "02"
     };
 
-    try alex.display_user(easy, allocator);
-    
+    try alex.display_user(easy, allocator);    
 }

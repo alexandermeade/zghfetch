@@ -56,17 +56,20 @@ pub const User = struct {
         const user_info = user.user_info.value;
         _ = &user_info;
         
-        const colmn = pos.col + 30;
-        var row = pos.row - 20;
+        const colmn = pos.col + 47;
+        var row:usize = pos.row; 
+
+        row = @max(row - 5, 0);
         if (user_info.name) |name| {
             try kitty.print_bottom_abs(&writer.interface, "name: {s}", .{name}, pos, colmn, row);
         }
-        row -= 1;
+
+        row = @max(row - 3, 0);
         if (user_info.bio) |bio| {
             try kitty.print_bottom_abs(&writer.interface, "bio: {s}", .{bio}, pos, colmn, row);
         }
 
-        row -= 1;
+
         
         //try kitty.print_bottom_abs(&writer.interface, "followers: {}", .{user_info.followers}, pos, colmn, row);
 
